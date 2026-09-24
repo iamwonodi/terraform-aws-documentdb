@@ -51,7 +51,7 @@ run "defaults_are_secure_and_smallest" {
   }
 
   assert {
-    condition     = aws_vpc_security_group_ingress_rule.from_security_group["sg-0app"].from_port == 27017 && length(aws_vpc_security_group_ingress_rule.from_cidr) == 0
+    condition     = aws_vpc_security_group_ingress_rule.from_security_group["0"].referenced_security_group_id == "sg-0app" && aws_vpc_security_group_ingress_rule.from_security_group["0"].from_port == 27017 && length(aws_vpc_security_group_ingress_rule.from_cidr) == 0
     error_message = "only the named security group may reach the port"
   }
 }

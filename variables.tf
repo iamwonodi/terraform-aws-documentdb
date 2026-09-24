@@ -323,6 +323,11 @@ variable "allowed_security_group_ids" {
   type        = list(string)
   default     = []
   description = "Security groups allowed to reach the cluster's port. Preferred over CIDRs: it follows the callers as their instances change."
+
+  validation {
+    condition     = length(distinct(var.allowed_security_group_ids)) == length(var.allowed_security_group_ids)
+    error_message = "allowed_security_group_ids must not list the same security group twice."
+  }
 }
 
 variable "allowed_cidr_blocks" {

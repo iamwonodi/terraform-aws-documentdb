@@ -79,7 +79,7 @@ A DCU is about 2 GiB of memory with its CPU and networking. Serverless tends to 
 
 ```hcl
 module "documentdb" {
-  source = "git::https://github.com/iamwonodi/terraform-aws-documentdb.git?ref=v1.0.0"
+  source = "git::https://github.com/iamwonodi/terraform-aws-documentdb.git?ref=v1.0.1"
 
   project_name = "acme"
   environment  = "staging"
@@ -100,7 +100,7 @@ One `db.t4g.medium` instance named `acme-staging-docdb-1`, encrypted, deletion-p
 
 ```hcl
 module "documentdb" {
-  source = "git::https://github.com/iamwonodi/terraform-aws-documentdb.git?ref=v1.0.0"
+  source = "git::https://github.com/iamwonodi/terraform-aws-documentdb.git?ref=v1.0.1"
 
   project_name = "acme"
   environment  = "production"
@@ -134,7 +134,7 @@ module "documentdb" {
 
 ```hcl
 module "documentdb" {
-  source = "git::https://github.com/iamwonodi/terraform-aws-documentdb.git?ref=v1.0.0"
+  source = "git::https://github.com/iamwonodi/terraform-aws-documentdb.git?ref=v1.0.1"
 
   project_name = "acme"
   environment  = "production"
@@ -362,8 +362,13 @@ This module follows Semantic Versioning. Consume it by tag, never by branch.
 Current release:
 
 ```text
-v1.0.0
+v1.0.1
 ```
+
+`v1.0.1` is a **patch** release relative to `v1.0.0`. It fixes the first plan of a fresh environment: the security-group ingress rules (`aws_vpc_security_group_ingress_rule.from_security_group`) were keyed by the IDs passed in, which are unknown until apply when those resources are created in the same run, so the plan failed with `Invalid for_each argument`. They are now keyed by position in the list. No input or output changed; listing the same ID twice is now refused rather than silently merged.
+
+**Upgrading an environment already applied with `v1.0.0`:** the plan re-creates those resources once under their new keys. To keep them in place, add a `moved` block per entry in the calling configuration, for example `moved { from = module.<name>.<resource>["<id>"]  to = module.<name>.<resource>["0"] }`. Keep the list's order stable afterwards: reordering it re-creates the moved entries.
+
 
 ---
 

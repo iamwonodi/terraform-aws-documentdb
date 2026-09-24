@@ -57,7 +57,10 @@ resource "aws_security_group" "this" {
 # the whole set on every change, which would drop a rule another configuration
 # added.
 resource "aws_vpc_security_group_ingress_rule" "from_security_group" {
-  for_each = var.create_security_group ? toset(var.allowed_security_group_ids) : []
+  # Keyed by position, not by ID: an ID created in the same apply is unknown when
+  # the plan is made, and for_each must know its keys then. Duplicates are
+  # refused by the variable's validation.
+  for_each = var.create_security_group ? { for index, id in var.allowed_security_group_ids : tostring(index) => id } : {}
 
   security_group_id            = aws_security_group.this[0].id
   referenced_security_group_id = each.value
